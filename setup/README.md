@@ -6,7 +6,7 @@
 3. In Zeile 1 diese Überschriften eintragen:
 
    ```
-   Zeitstempel | Verständlich | Atmosphäre | Fairness | Abwechslung | Hilfe | Zufriedenheit | Gelernt | Gefallen | Ändern | Schwierig | Sonstiges
+   Zeitstempel | Klasse | Verständlich | Atmosphäre | Fairness | Abwechslung | Hilfe | Zufriedenheit | Gelernt | Gefallen | Ändern | Schwierig | Sonstiges
    ```
 
 ## 2. Apps Script einrichten
@@ -29,15 +29,17 @@ Die kopierte URL in `index.html` bei `GOOGLE_SCRIPT_URL` einsetzen (Claude träg
 Neues Tabellenblatt "Zusammenfassung" anlegen, z. B.:
 
 ```
-Ø Verständlich   =AVERAGE(Antworten!B2:B1000)
-Ø Atmosphäre     =AVERAGE(Antworten!C2:C1000)
-Ø Fairness       =AVERAGE(Antworten!D2:D1000)
-Ø Abwechslung    =AVERAGE(Antworten!E2:E1000)
-Ø Hilfe          =AVERAGE(Antworten!F2:F1000)
-Ø Zufriedenheit  =AVERAGE(Antworten!G2:G1000)
+Ø Verständlich   =AVERAGE(Antworten!C2:C1000)
+Ø Atmosphäre     =AVERAGE(Antworten!D2:D1000)
+Ø Fairness       =AVERAGE(Antworten!E2:E1000)
+Ø Abwechslung    =AVERAGE(Antworten!F2:F1000)
+Ø Hilfe          =AVERAGE(Antworten!G2:G1000)
+Ø Zufriedenheit  =AVERAGE(Antworten!H2:H1000)
 Anzahl Antworten =COUNTA(Antworten!A2:A1000)
 ```
 
 Daraus lässt sich in Google Sheets auch direkt ein Diagramm einfügen (Einfügen → Diagramm).
+
+Um eine Klasse einzeln auszuwerten, z. B. mit `=AVERAGEIF(Antworten!$B$2:$B$1000; "5a"; Antworten!C2:C1000)` (Durchschnitt „Verständlich" nur für Klasse 5a).
 
 Das Sheet bleibt privat — nur du siehst die Antworten, niemand sonst im Internet.

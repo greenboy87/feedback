@@ -55,6 +55,18 @@
     font-size: 1.02rem;
   }
 
+  .klasse-tag {
+    display: none;
+    margin: 1rem auto 0;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 0.35rem 0.9rem;
+    border-radius: 999px;
+    width: fit-content;
+  }
+
   .card {
     background: var(--card);
     border-radius: 16px;
@@ -234,6 +246,7 @@
     <header>
       <h1>Feedback zum Schuljahr</h1>
       <p>Schön, dass du dir kurz Zeit nimmst! Dein Feedback ist anonym und hilft dabei, den Unterricht weiter zu verbessern. Sei ehrlich – das ist das Wichtigste.</p>
+      <p class="klasse-tag" id="klasse-tag"></p>
     </header>
 
     <div class="card">
@@ -315,6 +328,13 @@
     // Nach dem Deploy als Web-App bei Google Apps Script hier die URL eintragen (endet auf /exec)
     const GOOGLE_SCRIPT_URL = "GOOGLE_SCRIPT_URL_HIER_EINFÜGEN";
 
+    const klasse = new URLSearchParams(window.location.search).get("klasse") || "";
+    if (klasse) {
+      const tag = document.getElementById("klasse-tag");
+      tag.textContent = "Erfasst für: Klasse " + klasse;
+      tag.style.display = "block";
+    }
+
     document.querySelectorAll(".stars").forEach(function (container) {
       const total = 5;
       container.dataset.selected = 0;
@@ -361,7 +381,7 @@
 
     document.getElementById("submit-btn").addEventListener("click", function () {
       const btn = this;
-      const payload = {};
+      const payload = { klasse: klasse };
 
       document.querySelectorAll(".stars").forEach(function (container) {
         payload[container.dataset.question] = Number(container.dataset.selected);

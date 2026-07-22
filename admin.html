@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR-Codes für Klassen</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #faf6f0;
+    --card: #ffffff;
+    --ink: #3a332c;
+    --ink-soft: #766b5e;
+    --accent: #d97a4d;
+    --accent-soft: #f3e4d8;
+    --line: #ece3d8;
+    --shadow: 0 4px 18px rgba(60, 45, 25, 0.06);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    padding: 2.5rem 1.25rem 4rem;
+    line-height: 1.55;
+  }
+
+  .wrap {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  header h1 {
+    font-size: clamp(1.4rem, 4vw, 1.8rem);
+    margin: 0 0 0.5rem;
+  }
+
+  header p {
+    color: var(--ink-soft);
+    margin: 0;
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--line);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .create-row {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .create-row input {
+    flex: 1;
+    min-width: 160px;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: inherit;
+  }
+
+  .create-row input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .create-row button {
+    padding: 0.7rem 1.4rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+  }
+
+  .create-row button:hover {
+    background: #c2673d;
+  }
+
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .toolbar h2 {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    margin: 0;
+  }
+
+  .toolbar button {
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 0.4rem 0.9rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+    color: var(--ink);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+  }
+
+  .qr-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: var(--shadow);
+  }
+
+  .qr-card h3 {
+    margin: 0 0 0.6rem;
+    font-size: 1.1rem;
+  }
+
+  .qr-card img {
+    width: 100%;
+    max-width: 160px;
+    height: auto;
+    image-rendering: pixelated;
+  }
+
+  .qr-card .url {
+    font-size: 0.7rem;
+    color: var(--ink-soft);
+    word-break: break-all;
+    margin: 0.6rem 0;
+  }
+
+  .qr-card .actions {
+    display: flex;
+    gap: 0.4rem;
+    justify-content: center;
+  }
+
+  .qr-card .actions a,
+  .qr-card .actions button {
+    font-size: 0.78rem;
+    padding: 0.35rem 0.6rem;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--ink);
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .qr-card .actions .delete {
+    color: #b3432f;
+    border-color: #e8c9c1;
+  }
+
+  .empty {
+    color: var(--ink-soft);
+    text-align: center;
+    padding: 1.5rem 0;
+  }
+
+  @media print {
+    .create-row, .toolbar button, .qr-card .actions, header p {
+      display: none !important;
+    }
+    .card {
+      box-shadow: none;
+      border: none;
+    }
+    .qr-card {
+      break-inside: avoid;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <div class="wrap">
+    <header>
+      <h1>QR-Codes für Klassen erstellen</h1>
+      <p>Klasse eintragen, QR-Code wird automatisch erzeugt und lokal in diesem Browser gespeichert.</p>
+    </header>
+
+    <div class="card">
+      <div class="create-row">
+        <input type="text" id="klasse-input" placeholder="z. B. 5a" autofocus>
+        <button type="button" id="create-btn">QR-Code erstellen</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="toolbar">
+        <h2>Meine Klassen</h2>
+        <button type="button" id="print-btn">Alle drucken</button>
+      </div>
+      <div class="grid" id="grid"></div>
+      <p class="empty" id="empty-msg" style="display:none;">Noch keine Klasse erstellt.</p>
+    </div>
+  </div>
+
+  <script src="assets/qrcode.js"></script>
+  <script>
+    const STORAGE_KEY = "feedback_qr_classes";
+
+    function loadClasses() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveClasses(list) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    }
+
+    function buildUrl(klasse) {
+      return new URL("index.html?klasse=" + encodeURIComponent(klasse), window.location.href).href;
+    }
+
+    function makeQrDataUrl(text) {
+      const qr = qrcode(0, "M");
+      qr.addData(text);
+      qr.make();
+      return qr.createDataURL(8, 8);
+    }
+
+    function render() {
+      const list = loadClasses();
+      const grid = document.getElementById("grid");
+      const emptyMsg = document.getElementById("empty-msg");
+      grid.innerHTML = "";
+
+      if (list.length === 0) {
+        emptyMsg.style.display = "block";
+        return;
+      }
+      emptyMsg.style.display = "none";
+
+      list.forEach(function (entry, index) {
+        const card = document.createElement("div");
+        card.className = "qr-card";
+        card.innerHTML =
+          '<h3>' + entry.klasse + '</h3>' +
+          '<img src="' + entry.dataUrl + '" alt="QR-Code Klasse ' + entry.klasse + '">' +
+          '<p class="url">' + entry.url + '</p>' +
+          '<div class="actions">' +
+            '<a download="feedback-qr-' + entry.klasse + '.png" href="' + entry.dataUrl + '">PNG</a>' +
+            '<button type="button" class="delete" data-index="' + index + '">Löschen</button>' +
+          '</div>';
+        grid.appendChild(card);
+      });
+
+      grid.querySelectorAll(".delete").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          const list = loadClasses();
+          list.splice(Number(btn.dataset.index), 1);
+          saveClasses(list);
+          render();
+        });
+      });
+    }
+
+    document.getElementById("create-btn").addEventListener("click", function () {
+      const input = document.getElementById("klasse-input");
+      const klasse = input.value.trim();
+      if (!klasse) return;
+
+      const list = loadClasses();
+      if (list.some(function (e) { return e.klasse.toLowerCase() === klasse.toLowerCase(); })) {
+        alert("Diese Klasse gibt es schon in der Liste.");
+        return;
+      }
+
+      const url = buildUrl(klasse);
+      const dataUrl = makeQrDataUrl(url);
+      list.push({ klasse: klasse, url: url, dataUrl: dataUrl, created: Date.now() });
+      saveClasses(list);
+      input.value = "";
+      render();
+    });
+
+    document.getElementById("klasse-input").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        document.getElementById("create-btn").click();
+      }
+    });
+
+    document.getElementById("print-btn").addEventListener("click", function () {
+      window.print();
+    });
+
+    render();
+  </script>
+
+</body>
+</html>

@@ -4,6 +4,7 @@ function doPost(e) {
 
   sheet.appendRow([
     new Date(),
+    data.klasse,
     data.verstaendlich,
     data.atmosphaere,
     data.fairness,
