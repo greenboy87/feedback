@@ -463,24 +463,31 @@
       return div.innerHTML;
     }
 
-    function startListening() {
+    function whenFirebaseReady(callback) {
+      if (window.fbDb) {
+        callback();
+        return;
+      }
+      const iv = setInterval(function () {
+        if (window.fbDb) {
+          clearInterval(iv);
+          callback();
+        }
+      }, 50);
+    }
+
+    whenFirebaseReady(function () {
       window.fbOnValue(window.fbRef(window.fbDb, "classes"), function (snapshot) {
         renderKlassen(snapshot.val() || {});
       });
-    }
-
-    if (window.fbDb) {
-      startListening();
-    } else {
-      window.addEventListener("firebase-ready", startListening, { once: true });
-    }
+    });
 
     document.getElementById("create-btn").addEventListener("click", function () {
       const input = document.getElementById("klasse-input");
       const klasse = input.value.trim();
       if (!klasse) return;
 
-      function create() {
+      whenFirebaseReady(function () {
         window.fbGet(window.fbRef(window.fbDb, "classes/" + klasse)).then(function (snapshot) {
           if (snapshot.exists()) {
             alert('Klasse "' + klasse + '" gibt es schon.');
@@ -489,13 +496,7 @@
           window.fbSet(window.fbRef(window.fbDb, "classes/" + klasse + "/createdAt"), Date.now());
           input.value = "";
         });
-      }
-
-      if (window.fbDb) {
-        create();
-      } else {
-        window.addEventListener("firebase-ready", create, { once: true });
-      }
+      });
     });
 
     document.getElementById("klasse-input").addEventListener("keydown", function (e) {

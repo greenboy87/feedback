@@ -331,6 +331,19 @@
 
   <script type="module" src="assets/firebase-init.js"></script>
   <script>
+    function whenFirebaseReady(callback) {
+      if (window.fbDb) {
+        callback();
+        return;
+      }
+      const iv = setInterval(function () {
+        if (window.fbDb) {
+          clearInterval(iv);
+          callback();
+        }
+      }, 50);
+    }
+
     const klasse = new URLSearchParams(window.location.search).get("klasse") || "";
 
     if (klasse) {
@@ -406,7 +419,7 @@
       btn.disabled = true;
       btn.textContent = "Wird gesendet …";
 
-      function send() {
+      whenFirebaseReady(function () {
         const responsesRef = window.fbRef(window.fbDb, "classes/" + klasse + "/responses");
         window.fbPush(responsesRef, payload).finally(function () {
           document.querySelectorAll(".card, .submit-row").forEach(function (el) {
@@ -414,13 +427,7 @@
           });
           document.getElementById("thanks").classList.add("visible");
         });
-      }
-
-      if (window.fbDb) {
-        send();
-      } else {
-        window.addEventListener("firebase-ready", send, { once: true });
-      }
+      });
     });
   </script>
 

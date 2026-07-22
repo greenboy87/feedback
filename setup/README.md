@@ -22,10 +22,8 @@ Im Tab **Regeln** der Realtime Database diesen Inhalt einfügen und **Veröffent
 {
   "rules": {
     "classes": {
-      "$klasse": {
-        ".read": true,
-        ".write": true
-      }
+      ".read": true,
+      ".write": true
     }
   }
 }
