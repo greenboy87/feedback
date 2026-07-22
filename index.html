@@ -148,20 +148,29 @@
     color: var(--ink);
   }
 
-  textarea {
+  textarea,
+  .open-question input[type="text"] {
     width: 100%;
-    min-height: 90px;
     padding: 0.7rem 0.85rem;
     border: 1px solid var(--line);
     border-radius: 10px;
     font-size: 1rem;
     font-family: inherit;
-    resize: vertical;
     background: #fffdfb;
     color: var(--ink);
   }
 
-  textarea:focus {
+  textarea {
+    min-height: 90px;
+    resize: vertical;
+  }
+
+  .open-question input[type="text"] {
+    font-size: 1.4rem;
+  }
+
+  textarea:focus,
+  .open-question input[type="text"]:focus {
     outline: none;
     border-color: var(--accent);
   }
@@ -310,6 +319,11 @@
         <label for="sonstiges">Möchtest du mir noch etwas sagen?</label>
         <textarea id="sonstiges" name="sonstiges"></textarea>
       </div>
+
+      <div class="open-question">
+        <label for="emojis">Beschreib den Unterricht in Emojis 😄</label>
+        <input type="text" id="emojis" name="emojis" placeholder="🎸📚🔥">
+      </div>
     </div>
 
     <div class="submit-row">
@@ -410,7 +424,7 @@
         payload[container.dataset.question] = Number(container.dataset.selected);
       });
 
-      ["gelernt", "gefallen", "aendern", "schwierig", "sonstiges"].forEach(function (id) {
+      ["gelernt", "gefallen", "aendern", "schwierig", "sonstiges", "emojis"].forEach(function (id) {
         payload[id] = document.getElementById(id).value.trim();
       });
 
