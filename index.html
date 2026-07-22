@@ -160,6 +160,11 @@
     border-radius: 16px;
     padding: 2rem 1.5rem;
     margin-top: 1.5rem;
+    display: none;
+  }
+
+  .thanks.visible {
+    display: block;
   }
 
   .thanks p {
@@ -172,6 +177,42 @@
     font-size: 1.8rem;
     display: block;
     margin-bottom: 0.5rem;
+  }
+
+  .submit-row {
+    text-align: center;
+    margin-top: 1.75rem;
+  }
+
+  .submit-row button {
+    padding: 0.85rem 2.2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+  }
+
+  .submit-row button:hover {
+    background: #c2673d;
+  }
+
+  .submit-row button:active {
+    transform: scale(0.97);
+  }
+
+  .submit-row button:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  .submit-row .hint {
+    margin-top: 0.6rem;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
   }
 
   @media (max-width: 480px) {
@@ -258,7 +299,12 @@
       </div>
     </div>
 
-    <div class="thanks">
+    <div class="submit-row">
+      <button type="button" id="submit-btn">Feedback abschicken</button>
+      <p class="hint">Deine Antworten werden anonym übermittelt.</p>
+    </div>
+
+    <div class="thanks" id="thanks">
       <span class="emoji">🌱</span>
       <p>Danke, dass du dir die Zeit genommen hast – dein Feedback hilft wirklich weiter!</p>
     </div>
@@ -266,9 +312,12 @@
   </div>
 
   <script>
+    // Nach dem Deploy als Web-App bei Google Apps Script hier die URL eintragen (endet auf /exec)
+    const GOOGLE_SCRIPT_URL = "GOOGLE_SCRIPT_URL_HIER_EINFÜGEN";
+
     document.querySelectorAll(".stars").forEach(function (container) {
       const total = 5;
-      let selected = 0;
+      container.dataset.selected = 0;
 
       for (let i = 1; i <= total; i++) {
         const btn = document.createElement("button");
@@ -282,7 +331,7 @@
       const buttons = Array.from(container.querySelectorAll("button"));
 
       function render(previewValue) {
-        const value = previewValue ?? selected;
+        const selected = Number(container.dataset.selected);
         buttons.forEach(function (btn) {
           const v = Number(btn.dataset.value);
           btn.classList.toggle("filled", !previewValue && v <= selected);
@@ -303,9 +352,37 @@
         });
 
         btn.addEventListener("click", function () {
-          selected = selected === value ? 0 : value;
+          const current = Number(container.dataset.selected);
+          container.dataset.selected = current === value ? 0 : value;
           render();
         });
+      });
+    });
+
+    document.getElementById("submit-btn").addEventListener("click", function () {
+      const btn = this;
+      const payload = {};
+
+      document.querySelectorAll(".stars").forEach(function (container) {
+        payload[container.dataset.question] = Number(container.dataset.selected);
+      });
+
+      ["gelernt", "gefallen", "aendern", "schwierig", "sonstiges"].forEach(function (id) {
+        payload[id] = document.getElementById(id).value.trim();
+      });
+
+      btn.disabled = true;
+      btn.textContent = "Wird gesendet …";
+
+      fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body: JSON.stringify(payload)
+      }).finally(function () {
+        document.querySelectorAll(".card, .submit-row").forEach(function (el) {
+          el.style.display = "none";
+        });
+        document.getElementById("thanks").classList.add("visible");
       });
     });
   </script>
