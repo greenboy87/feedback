@@ -322,17 +322,27 @@
       <p>Danke, dass du dir die Zeit genommen hast – dein Feedback hilft wirklich weiter!</p>
     </div>
 
+    <div class="thanks" id="missing-klasse" style="display:none;">
+      <span class="emoji">🔗</span>
+      <p>Für dieses Formular fehlt der Klassen-Link. Bitte nutze den QR-Code bzw. Link, den dir deine Lehrkraft gegeben hat.</p>
+    </div>
+
   </div>
 
+  <script type="module" src="assets/firebase-init.js"></script>
   <script>
-    // Nach dem Deploy als Web-App bei Google Apps Script hier die URL eintragen (endet auf /exec)
-    const GOOGLE_SCRIPT_URL = "GOOGLE_SCRIPT_URL_HIER_EINFÜGEN";
-
     const klasse = new URLSearchParams(window.location.search).get("klasse") || "";
+
     if (klasse) {
       const tag = document.getElementById("klasse-tag");
       tag.textContent = "Erfasst für: Klasse " + klasse;
       tag.style.display = "block";
+    } else {
+      document.querySelectorAll(".card, .submit-row").forEach(function (el) {
+        el.style.display = "none";
+      });
+      const missing = document.getElementById("missing-klasse");
+      missing.style.display = "block";
     }
 
     document.querySelectorAll(".stars").forEach(function (container) {
@@ -381,7 +391,7 @@
 
     document.getElementById("submit-btn").addEventListener("click", function () {
       const btn = this;
-      const payload = { klasse: klasse };
+      const payload = {};
 
       document.querySelectorAll(".stars").forEach(function (container) {
         payload[container.dataset.question] = Number(container.dataset.selected);
@@ -391,19 +401,26 @@
         payload[id] = document.getElementById(id).value.trim();
       });
 
+      payload.ts = Date.now();
+
       btn.disabled = true;
       btn.textContent = "Wird gesendet …";
 
-      fetch(GOOGLE_SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        body: JSON.stringify(payload)
-      }).finally(function () {
-        document.querySelectorAll(".card, .submit-row").forEach(function (el) {
-          el.style.display = "none";
+      function send() {
+        const responsesRef = window.fbRef(window.fbDb, "classes/" + klasse + "/responses");
+        window.fbPush(responsesRef, payload).finally(function () {
+          document.querySelectorAll(".card, .submit-row").forEach(function (el) {
+            el.style.display = "none";
+          });
+          document.getElementById("thanks").classList.add("visible");
         });
-        document.getElementById("thanks").classList.add("visible");
-      });
+      }
+
+      if (window.fbDb) {
+        send();
+      } else {
+        window.addEventListener("firebase-ready", send, { once: true });
+      }
     });
   </script>
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QR-Codes für Klassen</title>
+<title>Feedback – Lehrkraft-Ansicht</title>
 <style>
   :root {
     color-scheme: light;
@@ -14,6 +14,7 @@
     --accent: #d97a4d;
     --accent-soft: #f3e4d8;
     --line: #ece3d8;
+    --star: #e0a850;
     --shadow: 0 4px 18px rgba(60, 45, 25, 0.06);
   }
 
@@ -31,7 +32,7 @@
   }
 
   .wrap {
-    max-width: 720px;
+    max-width: 760px;
     margin: 0 auto;
   }
 
@@ -95,76 +96,60 @@
     background: #c2673d;
   }
 
-  .toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  h2.section-title {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin: 0 0 1.1rem;
+  }
+
+  .empty {
+    color: var(--ink-soft);
+    text-align: center;
+    padding: 1rem 0;
+  }
+
+  .klasse-card {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 1.1rem 1.2rem;
     margin-bottom: 1rem;
   }
 
-  .toolbar h2 {
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--accent);
+  .klasse-card:last-child {
+    margin-bottom: 0;
+  }
+
+  .klasse-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .klasse-head h3 {
     margin: 0;
+    font-size: 1.15rem;
   }
 
-  .toolbar button {
-    background: none;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    padding: 0.4rem 0.9rem;
-    font-size: 0.85rem;
-    cursor: pointer;
-    color: var(--ink);
-  }
-
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 1rem;
-  }
-
-  .qr-card {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 1rem;
-    text-align: center;
-    box-shadow: var(--shadow);
-  }
-
-  .qr-card h3 {
-    margin: 0 0 0.6rem;
-    font-size: 1.1rem;
-  }
-
-  .qr-card img {
-    width: 100%;
-    max-width: 160px;
-    height: auto;
-    image-rendering: pixelated;
-  }
-
-  .qr-card .url {
-    font-size: 0.7rem;
+  .klasse-head .count {
+    font-size: 0.82rem;
     color: var(--ink-soft);
-    word-break: break-all;
-    margin: 0.6rem 0;
   }
 
-  .qr-card .actions {
+  .klasse-actions {
     display: flex;
     gap: 0.4rem;
-    justify-content: center;
+    flex-wrap: wrap;
   }
 
-  .qr-card .actions a,
-  .qr-card .actions button {
+  .klasse-actions button,
+  .klasse-actions a {
     font-size: 0.78rem;
-    padding: 0.35rem 0.6rem;
-    border-radius: 6px;
+    padding: 0.4rem 0.7rem;
+    border-radius: 7px;
     border: 1px solid var(--line);
     background: #fff;
     color: var(--ink);
@@ -172,71 +157,203 @@
     cursor: pointer;
   }
 
-  .qr-card .actions .delete {
+  .klasse-actions .delete {
     color: #b3432f;
     border-color: #e8c9c1;
   }
 
-  .empty {
-    color: var(--ink-soft);
-    text-align: center;
-    padding: 1.5rem 0;
+  .qr-row {
+    display: flex;
+    gap: 1.2rem;
+    align-items: flex-start;
+    margin-top: 1rem;
+    flex-wrap: wrap;
   }
 
-  @media print {
-    .create-row, .toolbar button, .qr-card .actions, header p {
-      display: none !important;
-    }
-    .card {
-      box-shadow: none;
-      border: none;
-    }
-    .qr-card {
-      break-inside: avoid;
-    }
+  .qr-row img {
+    width: 130px;
+    height: 130px;
+    image-rendering: pixelated;
+    flex-shrink: 0;
+  }
+
+  .qr-row .url {
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    word-break: break-all;
+    max-width: 320px;
+  }
+
+  .results {
+    margin-top: 1.2rem;
+    padding-top: 1.1rem;
+    border-top: 1px solid var(--line);
+    display: none;
+  }
+
+  .results.open {
+    display: block;
+  }
+
+  .avg-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    padding: 0.35rem 0;
+  }
+
+  .avg-row .val {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .open-answers h4 {
+    font-size: 0.85rem;
+    margin: 1rem 0 0.4rem;
+  }
+
+  .open-answers ul {
+    margin: 0;
+    padding-left: 1.1rem;
+    font-size: 0.88rem;
+  }
+
+  .open-answers li {
+    margin-bottom: 0.25rem;
+  }
+
+  .open-answers .none {
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    font-style: italic;
+  }
+
+  /* Passwort-Overlay */
+  #password-gate {
+    position: fixed;
+    inset: 0;
+    background: rgba(58, 51, 44, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    padding: 1rem;
+  }
+
+  #password-gate .box {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 340px;
+    width: 100%;
+    text-align: center;
+    box-shadow: var(--shadow);
+  }
+
+  #password-gate h2 {
+    margin: 0 0 0.75rem;
+    font-size: 1.1rem;
+  }
+
+  #password-gate input {
+    width: 100%;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  #password-gate button {
+    width: 100%;
+    padding: 0.7rem;
+    border: none;
+    border-radius: 10px;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  #password-gate .error {
+    color: #b3432f;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    display: none;
+  }
+
+  #main-content {
+    display: none;
   }
 </style>
 </head>
 <body>
 
-  <div class="wrap">
+  <div id="password-gate">
+    <div class="box">
+      <h2>Lehrkraft-Ansicht</h2>
+      <input type="password" id="password-input" placeholder="Passwort" autofocus>
+      <button type="button" id="password-submit">Freischalten</button>
+      <p class="error" id="password-error">Falsches Passwort.</p>
+    </div>
+  </div>
+
+  <div class="wrap" id="main-content">
     <header>
-      <h1>QR-Codes für Klassen erstellen</h1>
-      <p>Klasse eintragen, QR-Code wird automatisch erzeugt und lokal in diesem Browser gespeichert.</p>
+      <h1>Feedback – Klassen verwalten</h1>
+      <p>Klasse anlegen, Link/QR-Code teilen, Ergebnisse direkt hier einsehen.</p>
     </header>
 
     <div class="card">
       <div class="create-row">
-        <input type="text" id="klasse-input" placeholder="z. B. 5a" autofocus>
-        <button type="button" id="create-btn">QR-Code erstellen</button>
+        <input type="text" id="klasse-input" placeholder="z. B. 5a">
+        <button type="button" id="create-btn">Klasse anlegen</button>
       </div>
     </div>
 
     <div class="card">
-      <div class="toolbar">
-        <h2>Meine Klassen</h2>
-        <button type="button" id="print-btn">Alle drucken</button>
-      </div>
-      <div class="grid" id="grid"></div>
-      <p class="empty" id="empty-msg" style="display:none;">Noch keine Klasse erstellt.</p>
+      <h2 class="section-title">Meine Klassen</h2>
+      <div id="klassen-list"></div>
+      <p class="empty" id="empty-msg" style="display:none;">Noch keine Klasse angelegt.</p>
     </div>
   </div>
 
   <script src="assets/qrcode.js"></script>
+  <script type="module" src="assets/firebase-init.js"></script>
   <script>
-    const STORAGE_KEY = "feedback_qr_classes";
+    const TEACHER_PASSWORD = "feedback2026";
 
-    function loadClasses() {
-      try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-      } catch (e) {
-        return [];
+    const RATING_FIELDS = [
+      { key: "verstaendlich", label: "Verständlich" },
+      { key: "atmosphaere", label: "Atmosphäre" },
+      { key: "fairness", label: "Fairness" },
+      { key: "abwechslung", label: "Abwechslung" },
+      { key: "hilfe", label: "Hilfe bei Problemen" },
+      { key: "zufriedenheit", label: "Zufriedenheit gesamt" }
+    ];
+
+    const OPEN_FIELDS = [
+      { key: "gelernt", label: "Was gelernt?" },
+      { key: "gefallen", label: "Was gefallen?" },
+      { key: "aendern", label: "Was ändern?" },
+      { key: "schwierig", label: "Was war schwierig?" },
+      { key: "sonstiges", label: "Sonstiges" }
+    ];
+
+    function checkPassword() {
+      const input = document.getElementById("password-input");
+      if (input.value === TEACHER_PASSWORD) {
+        document.getElementById("password-gate").style.display = "none";
+        document.getElementById("main-content").style.display = "block";
+      } else {
+        document.getElementById("password-error").style.display = "block";
       }
     }
 
-    function saveClasses(list) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-    }
+    document.getElementById("password-submit").addEventListener("click", checkPassword);
+    document.getElementById("password-input").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") checkPassword();
+    });
 
     function buildUrl(klasse) {
       return new URL("index.html?klasse=" + encodeURIComponent(klasse), window.location.href).href;
@@ -249,40 +366,113 @@
       return qr.createDataURL(8, 8);
     }
 
-    function render() {
-      const list = loadClasses();
-      const grid = document.getElementById("grid");
-      const emptyMsg = document.getElementById("empty-msg");
-      grid.innerHTML = "";
+    function average(responses, key) {
+      const values = Object.values(responses)
+        .map(function (r) { return Number(r[key]); })
+        .filter(function (v) { return v > 0; });
+      if (values.length === 0) return null;
+      return (values.reduce(function (a, b) { return a + b; }, 0) / values.length).toFixed(1);
+    }
 
-      if (list.length === 0) {
+    function renderKlassen(classes) {
+      const list = document.getElementById("klassen-list");
+      const emptyMsg = document.getElementById("empty-msg");
+      list.innerHTML = "";
+
+      const names = Object.keys(classes || {}).sort();
+
+      if (names.length === 0) {
         emptyMsg.style.display = "block";
         return;
       }
       emptyMsg.style.display = "none";
 
-      list.forEach(function (entry, index) {
-        const card = document.createElement("div");
-        card.className = "qr-card";
-        card.innerHTML =
-          '<h3>' + entry.klasse + '</h3>' +
-          '<img src="' + entry.dataUrl + '" alt="QR-Code Klasse ' + entry.klasse + '">' +
-          '<p class="url">' + entry.url + '</p>' +
-          '<div class="actions">' +
-            '<a download="feedback-qr-' + entry.klasse + '.png" href="' + entry.dataUrl + '">PNG</a>' +
-            '<button type="button" class="delete" data-index="' + index + '">Löschen</button>' +
-          '</div>';
-        grid.appendChild(card);
-      });
+      names.forEach(function (klasse) {
+        const data = classes[klasse] || {};
+        const responses = data.responses || {};
+        const count = Object.keys(responses).length;
+        const url = buildUrl(klasse);
 
-      grid.querySelectorAll(".delete").forEach(function (btn) {
-        btn.addEventListener("click", function () {
-          const list = loadClasses();
-          list.splice(Number(btn.dataset.index), 1);
-          saveClasses(list);
-          render();
+        const card = document.createElement("div");
+        card.className = "klasse-card";
+
+        let avgHtml = "";
+        RATING_FIELDS.forEach(function (f) {
+          const avg = average(responses, f.key);
+          avgHtml += '<div class="avg-row"><span>' + f.label + '</span><span class="val">' + (avg ? avg + " ★" : "–") + '</span></div>';
         });
+
+        let openHtml = "";
+        OPEN_FIELDS.forEach(function (f) {
+          const answers = Object.values(responses)
+            .map(function (r) { return (r[f.key] || "").trim(); })
+            .filter(function (v) { return v.length > 0; });
+          openHtml += '<h4>' + f.label + '</h4>';
+          if (answers.length === 0) {
+            openHtml += '<p class="none">Keine Antworten</p>';
+          } else {
+            openHtml += '<ul>' + answers.map(function (a) { return '<li>' + escapeHtml(a) + '</li>'; }).join("") + '</ul>';
+          }
+        });
+
+        card.innerHTML =
+          '<div class="klasse-head">' +
+            '<h3>' + escapeHtml(klasse) + '</h3>' +
+            '<span class="count">' + count + ' Antwort' + (count === 1 ? '' : 'en') + '</span>' +
+            '<div class="klasse-actions">' +
+              '<button type="button" class="toggle-results">Ergebnisse anzeigen</button>' +
+              '<button type="button" class="copy-link">Link kopieren</button>' +
+              '<button type="button" class="delete">Löschen</button>' +
+            '</div>' +
+          '</div>' +
+          '<div class="qr-row">' +
+            '<img src="' + makeQrDataUrl(url) + '" alt="QR-Code Klasse ' + escapeHtml(klasse) + '">' +
+            '<span class="url">' + url + '</span>' +
+          '</div>' +
+          '<div class="results">' +
+            avgHtml +
+            '<div class="open-answers">' + openHtml + '</div>' +
+          '</div>';
+
+        card.querySelector(".toggle-results").addEventListener("click", function () {
+          const panel = card.querySelector(".results");
+          const open = panel.classList.toggle("open");
+          this.textContent = open ? "Ergebnisse ausblenden" : "Ergebnisse anzeigen";
+        });
+
+        card.querySelector(".copy-link").addEventListener("click", function () {
+          navigator.clipboard.writeText(url);
+          const btn = this;
+          const old = btn.textContent;
+          btn.textContent = "Kopiert!";
+          setTimeout(function () { btn.textContent = old; }, 1500);
+        });
+
+        card.querySelector(".delete").addEventListener("click", function () {
+          if (!confirm('Klasse "' + klasse + '" inkl. aller Antworten wirklich löschen?')) return;
+          window.fbRemove(window.fbRef(window.fbDb, "classes/" + klasse));
+        });
+
+        list.appendChild(card);
       });
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement("div");
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function startListening() {
+      window.fbOnValue(window.fbRef(window.fbDb, "classes"), function (snapshot) {
+        renderKlassen(snapshot.val() || {});
+      });
+    }
+
+    if (window.fbDb) {
+      startListening();
+    } else {
+      window.addEventListener("firebase-ready", startListening, { once: true });
     }
 
     document.getElementById("create-btn").addEventListener("click", function () {
@@ -290,31 +480,27 @@
       const klasse = input.value.trim();
       if (!klasse) return;
 
-      const list = loadClasses();
-      if (list.some(function (e) { return e.klasse.toLowerCase() === klasse.toLowerCase(); })) {
-        alert("Diese Klasse gibt es schon in der Liste.");
-        return;
+      function create() {
+        window.fbGet(window.fbRef(window.fbDb, "classes/" + klasse)).then(function (snapshot) {
+          if (snapshot.exists()) {
+            alert('Klasse "' + klasse + '" gibt es schon.');
+            return;
+          }
+          window.fbSet(window.fbRef(window.fbDb, "classes/" + klasse + "/createdAt"), Date.now());
+          input.value = "";
+        });
       }
 
-      const url = buildUrl(klasse);
-      const dataUrl = makeQrDataUrl(url);
-      list.push({ klasse: klasse, url: url, dataUrl: dataUrl, created: Date.now() });
-      saveClasses(list);
-      input.value = "";
-      render();
+      if (window.fbDb) {
+        create();
+      } else {
+        window.addEventListener("firebase-ready", create, { once: true });
+      }
     });
 
     document.getElementById("klasse-input").addEventListener("keydown", function (e) {
-      if (e.key === "Enter") {
-        document.getElementById("create-btn").click();
-      }
+      if (e.key === "Enter") document.getElementById("create-btn").click();
     });
-
-    document.getElementById("print-btn").addEventListener("click", function () {
-      window.print();
-    });
-
-    render();
   </script>
 
 </body>
