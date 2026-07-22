@@ -228,6 +228,77 @@
     font-style: italic;
   }
 
+  .single-answers {
+    display: none;
+    margin-top: 1.2rem;
+    padding-top: 1.1rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .single-answers.open {
+    display: block;
+  }
+
+  .answer-card {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 0.9rem 1rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .answer-card:last-child {
+    margin-bottom: 0;
+  }
+
+  .answer-card .answer-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+  }
+
+  .answer-card .stars-line {
+    font-size: 0.85rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .answer-card .stars-line span {
+    display: inline-block;
+    margin-right: 0.9rem;
+    white-space: nowrap;
+  }
+
+  .answer-card .stars-line .star-val {
+    color: var(--star);
+  }
+
+  .answer-card dl {
+    margin: 0;
+    font-size: 0.88rem;
+  }
+
+  .answer-card dt {
+    font-weight: 600;
+    margin-top: 0.5rem;
+  }
+
+  .answer-card dt:first-child {
+    margin-top: 0;
+  }
+
+  .answer-card dd {
+    margin: 0.1rem 0 0;
+    color: var(--ink);
+  }
+
+  .answer-card dd.empty-answer {
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+
   /* Passwort-Overlay */
   #password-gate {
     position: fixed;
@@ -421,6 +492,7 @@
             '<span class="count">' + count + ' Antwort' + (count === 1 ? '' : 'en') + '</span>' +
             '<div class="klasse-actions">' +
               '<button type="button" class="toggle-results">Ergebnisse anzeigen</button>' +
+              '<button type="button" class="toggle-single">Einzelantworten anzeigen</button>' +
               '<button type="button" class="copy-link">Link kopieren</button>' +
               '<button type="button" class="delete">Löschen</button>' +
             '</div>' +
@@ -432,12 +504,19 @@
           '<div class="results">' +
             avgHtml +
             '<div class="open-answers">' + openHtml + '</div>' +
-          '</div>';
+          '</div>' +
+          '<div class="single-answers">' + renderSingleAnswers(responses) + '</div>';
 
         card.querySelector(".toggle-results").addEventListener("click", function () {
           const panel = card.querySelector(".results");
           const open = panel.classList.toggle("open");
           this.textContent = open ? "Ergebnisse ausblenden" : "Ergebnisse anzeigen";
+        });
+
+        card.querySelector(".toggle-single").addEventListener("click", function () {
+          const panel = card.querySelector(".single-answers");
+          const open = panel.classList.toggle("open");
+          this.textContent = open ? "Einzelantworten ausblenden" : "Einzelantworten anzeigen";
         });
 
         card.querySelector(".copy-link").addEventListener("click", function () {
@@ -455,6 +534,41 @@
 
         list.appendChild(card);
       });
+    }
+
+    function starDisplay(value) {
+      const v = Number(value) || 0;
+      return '★'.repeat(v) + '☆'.repeat(5 - v);
+    }
+
+    function renderSingleAnswers(responses) {
+      const entries = Object.keys(responses)
+        .map(function (id) { return responses[id]; })
+        .sort(function (a, b) { return (a.ts || 0) - (b.ts || 0); });
+
+      if (entries.length === 0) {
+        return '<p class="none">Noch keine Antworten.</p>';
+      }
+
+      return entries.map(function (r, i) {
+        const timeLabel = r.ts ? new Date(r.ts).toLocaleString("de-DE") : "";
+
+        const starsLine = RATING_FIELDS.map(function (f) {
+          return '<span>' + f.label + ': <span class="star-val">' + starDisplay(r[f.key]) + '</span></span>';
+        }).join("");
+
+        const dl = OPEN_FIELDS.map(function (f) {
+          const val = (r[f.key] || "").trim();
+          return '<dt>' + f.label + '</dt><dd' + (val ? '' : ' class="empty-answer"') + '>' +
+            (val ? escapeHtml(val) : "Keine Angabe") + '</dd>';
+        }).join("");
+
+        return '<div class="answer-card">' +
+          '<div class="answer-head"><span>Antwort ' + (i + 1) + '</span><span>' + timeLabel + '</span></div>' +
+          '<div class="stars-line">' + starsLine + '</div>' +
+          '<dl>' + dl + '</dl>' +
+          '</div>';
+      }).join("");
     }
 
     function escapeHtml(str) {
