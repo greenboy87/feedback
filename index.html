@@ -3,136 +3,310 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Feedbackbogen</title>
+<title>Feedback zum Schuljahr</title>
 <style>
   :root {
-    color-scheme: light dark;
+    color-scheme: light;
+    --bg: #faf6f0;
+    --card: #ffffff;
+    --ink: #3a332c;
+    --ink-soft: #766b5e;
+    --accent: #d97a4d;
+    --accent-soft: #f3e4d8;
+    --line: #ece3d8;
+    --star: #e0a850;
+    --star-off: #ddd3c4;
+    --shadow: 0 4px 18px rgba(60, 45, 25, 0.06);
   }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    max-width: 640px;
-    margin: 0 auto;
-    padding: 2rem 1.25rem 4rem;
-    line-height: 1.5;
-  }
-  h1 {
-    font-size: 1.5rem;
-    margin-bottom: 0.25rem;
-  }
-  p.intro {
-    color: #666;
-    margin-top: 0;
-  }
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-    margin-top: 2rem;
-  }
-  label {
-    font-weight: 600;
-    display: block;
-    margin-bottom: 0.4rem;
-  }
-  input, textarea, select {
-    width: 100%;
-    padding: 0.6rem 0.7rem;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-family: inherit;
+
+  * {
     box-sizing: border-box;
   }
-  textarea {
-    min-height: 120px;
-    resize: vertical;
+
+  body {
+    margin: 0;
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    padding: 2.5rem 1.25rem 4rem;
+    line-height: 1.55;
   }
-  .rating {
-    display: flex;
-    gap: 0.5rem;
+
+  .wrap {
+    max-width: 680px;
+    margin: 0 auto;
   }
-  .rating label {
-    font-weight: 400;
+
+  header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  header h1 {
+    font-size: clamp(1.6rem, 4vw, 2.1rem);
+    margin: 0 0 0.6rem;
+    color: var(--ink);
+  }
+
+  header p {
+    color: var(--ink-soft);
+    max-width: 46ch;
+    margin: 0 auto;
+    font-size: 1.02rem;
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--line);
+    padding: 1.5rem 1.5rem 1.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .card h2 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin: 0 0 1.25rem;
+  }
+
+  .rating-row {
     display: flex;
     align-items: center;
-    gap: 0.3rem;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .rating-row:last-child {
+    border-bottom: none;
+  }
+
+  .rating-row .question {
+    font-size: 1rem;
+    color: var(--ink);
+    flex: 1;
+  }
+
+  .stars {
+    display: flex;
+    gap: 0.15rem;
+    flex-shrink: 0;
+  }
+
+  .stars button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.15rem;
+    font-size: 1.6rem;
+    line-height: 1;
+    color: var(--star-off);
+    transition: transform 0.12s ease, color 0.12s ease;
+  }
+
+  .stars button:hover,
+  .stars button:focus-visible {
+    transform: scale(1.15);
+  }
+
+  .stars.hovering button.preview {
+    color: var(--star);
+  }
+
+  .stars button.filled {
+    color: var(--star);
+  }
+
+  .open-question {
+    margin-bottom: 1.4rem;
+  }
+
+  .open-question:last-child {
     margin-bottom: 0;
   }
-  button {
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
+
+  .open-question label {
+    display: block;
     font-weight: 600;
-    border: none;
-    border-radius: 8px;
-    background: #2563eb;
-    color: white;
-    cursor: pointer;
-    align-self: flex-start;
+    margin-bottom: 0.5rem;
+    color: var(--ink);
   }
-  button:hover {
-    background: #1d4ed8;
+
+  textarea {
+    width: 100%;
+    min-height: 90px;
+    padding: 0.7rem 0.85rem;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: inherit;
+    resize: vertical;
+    background: #fffdfb;
+    color: var(--ink);
+  }
+
+  textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .thanks {
+    text-align: center;
+    background: var(--accent-soft);
+    border-radius: 16px;
+    padding: 2rem 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .thanks p {
+    margin: 0;
+    color: var(--ink);
+    font-size: 1.05rem;
+  }
+
+  .thanks .emoji {
+    font-size: 1.8rem;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  @media (max-width: 480px) {
+    .rating-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    .stars button {
+      font-size: 1.4rem;
+    }
   }
 </style>
 </head>
 <body>
 
-  <h1>Feedbackbogen</h1>
-  <p class="intro">Bitte fülle das Formular aus. Nach dem Absenden öffnet sich dein E-Mail-Programm mit deinen Antworten – dort einfach senden.</p>
+  <div class="wrap">
 
-  <form id="feedback-form">
-    <div>
-      <label for="name">Name (optional)</label>
-      <input type="text" id="name" name="name">
-    </div>
+    <header>
+      <h1>Feedback zum Schuljahr</h1>
+      <p>Schön, dass du dir kurz Zeit nimmst! Dein Feedback ist anonym und hilft dabei, den Unterricht weiter zu verbessern. Sei ehrlich – das ist das Wichtigste.</p>
+    </header>
 
-    <div>
-      <label for="klasse">Klasse / Kurs</label>
-      <input type="text" id="klasse" name="klasse">
-    </div>
+    <div class="card">
+      <h2>Bewertung</h2>
 
-    <div>
-      <label>Wie hat dir das Thema insgesamt gefallen?</label>
-      <div class="rating">
-        <label><input type="radio" name="bewertung" value="1 - sehr schlecht"> 1</label>
-        <label><input type="radio" name="bewertung" value="2 - schlecht"> 2</label>
-        <label><input type="radio" name="bewertung" value="3 - okay"> 3</label>
-        <label><input type="radio" name="bewertung" value="4 - gut"> 4</label>
-        <label><input type="radio" name="bewertung" value="5 - sehr gut"> 5</label>
+      <div class="rating-row">
+        <span class="question">Wie verständlich waren meine Erklärungen?</span>
+        <div class="stars" data-question="verstaendlich"></div>
+      </div>
+
+      <div class="rating-row">
+        <span class="question">Wie war die Atmosphäre im Unterricht?</span>
+        <div class="stars" data-question="atmosphaere"></div>
+      </div>
+
+      <div class="rating-row">
+        <span class="question">Wie fair fandest du die Bewertungen/Noten?</span>
+        <div class="stars" data-question="fairness"></div>
+      </div>
+
+      <div class="rating-row">
+        <span class="question">Wie abwechslungsreich war der Unterricht?</span>
+        <div class="stars" data-question="abwechslung"></div>
+      </div>
+
+      <div class="rating-row">
+        <span class="question">Wie gut konntest du bei Problemen Hilfe bekommen?</span>
+        <div class="stars" data-question="hilfe"></div>
+      </div>
+
+      <div class="rating-row">
+        <span class="question">Wie zufrieden warst du insgesamt mit dem Schuljahr?</span>
+        <div class="stars" data-question="zufriedenheit"></div>
       </div>
     </div>
 
-    <div>
-      <label for="positiv">Was hat dir besonders gut gefallen?</label>
-      <textarea id="positiv" name="positiv"></textarea>
+    <div class="card">
+      <h2>In eigenen Worten</h2>
+
+      <div class="open-question">
+        <label for="gelernt">Was hast du dieses Schuljahr gelernt?</label>
+        <textarea id="gelernt" name="gelernt"></textarea>
+      </div>
+
+      <div class="open-question">
+        <label for="gefallen">Was hat dir am besten gefallen?</label>
+        <textarea id="gefallen" name="gefallen"></textarea>
+      </div>
+
+      <div class="open-question">
+        <label for="aendern">Was hat dir weniger gefallen / was würdest du ändern?</label>
+        <textarea id="aendern" name="aendern"></textarea>
+      </div>
+
+      <div class="open-question">
+        <label for="schwierig">Was war für dich am schwierigsten?</label>
+        <textarea id="schwierig" name="schwierig"></textarea>
+      </div>
+
+      <div class="open-question">
+        <label for="sonstiges">Möchtest du mir noch etwas sagen?</label>
+        <textarea id="sonstiges" name="sonstiges"></textarea>
+      </div>
     </div>
 
-    <div>
-      <label for="verbesserung">Was könnte verbessert werden?</label>
-      <textarea id="verbesserung" name="verbesserung"></textarea>
+    <div class="thanks">
+      <span class="emoji">🌱</span>
+      <p>Danke, dass du dir die Zeit genommen hast – dein Feedback hilft wirklich weiter!</p>
     </div>
 
-    <button type="submit">Feedback absenden</button>
-  </form>
+  </div>
 
   <script>
-    const EMPFAENGER_EMAIL = "tomgruenig87@gmail.com";
+    document.querySelectorAll(".stars").forEach(function (container) {
+      const total = 5;
+      let selected = 0;
 
-    document.getElementById("feedback-form").addEventListener("submit", function (e) {
-      e.preventDefault();
-      const data = new FormData(e.target);
+      for (let i = 1; i <= total; i++) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = "★";
+        btn.dataset.value = i;
+        btn.setAttribute("aria-label", i + " von " + total + " Sternen");
+        container.appendChild(btn);
+      }
 
-      const name = data.get("name") || "(anonym)";
-      const klasse = data.get("klasse") || "-";
-      const bewertung = data.get("bewertung") || "-";
-      const positiv = data.get("positiv") || "-";
-      const verbesserung = data.get("verbesserung") || "-";
+      const buttons = Array.from(container.querySelectorAll("button"));
 
-      const subject = encodeURIComponent("Feedbackbogen: " + klasse);
-      const body = encodeURIComponent(
-        `Name: ${name}\nKlasse/Kurs: ${klasse}\nBewertung: ${bewertung}\n\nPositiv:\n${positiv}\n\nVerbesserungsvorschläge:\n${verbesserung}`
-      );
+      function render(previewValue) {
+        const value = previewValue ?? selected;
+        buttons.forEach(function (btn) {
+          const v = Number(btn.dataset.value);
+          btn.classList.toggle("filled", !previewValue && v <= selected);
+          btn.classList.toggle("preview", !!previewValue && v <= previewValue);
+        });
+        container.classList.toggle("hovering", !!previewValue);
+      }
 
-      window.location.href = `mailto:${EMPFAENGER_EMAIL}?subject=${subject}&body=${body}`;
+      buttons.forEach(function (btn) {
+        const value = Number(btn.dataset.value);
+
+        btn.addEventListener("mouseenter", function () {
+          render(value);
+        });
+
+        btn.addEventListener("mouseleave", function () {
+          render();
+        });
+
+        btn.addEventListener("click", function () {
+          selected = selected === value ? 0 : value;
+          render();
+        });
+      });
     });
   </script>
 
