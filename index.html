@@ -586,13 +586,15 @@
 
       const payload = Object.assign({}, answers, { ts: Date.now() });
 
+      function showThanks() {
+        deck.innerHTML = "";
+        deck.style.transform = "translateX(0)";
+        deck.appendChild(buildMessageCard("🌱", "Danke, dass du dir die Zeit genommen hast – dein Feedback hilft wirklich weiter!"));
+      }
+
       whenFirebaseReady(function () {
         const responsesRef = window.fbRef(window.fbDb, "classes/" + klasse + "/responses");
-        window.fbPush(responsesRef, payload).finally(function () {
-          deck.innerHTML = "";
-          deck.style.transform = "translateX(0)";
-          deck.appendChild(buildMessageCard("🌱", "Danke, dass du dir die Zeit genommen hast – dein Feedback hilft wirklich weiter!"));
-        });
+        window.fbPush(responsesRef, payload).then(showThanks).catch(showThanks);
       });
     }
   </script>
