@@ -402,6 +402,9 @@
   <script src="assets/qrcode.js"></script>
   <script type="module" src="assets/firebase-init.js"></script>
   <script>
+    const ICON_PREV = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20 6v12l-8-6 8-6zm-9 0v12l-8-6 8-6z"/></svg>';
+    const ICON_NEXT = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6v12l8-6-8-6zm9 0v12l8-6-8-6z"/></svg>';
+
     function whenFirebaseReady(callback) {
       if (window.fbDb) {
         callback();
@@ -608,9 +611,6 @@
       return '<div class="scrubber"><div class="track"><div class="fill"></div><div class="dot"></div></div>' +
         '<div class="labels"><span class="label-left"></span><span class="label-right"></span></div></div>';
     }
-
-    const ICON_PREV = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20 6v12l-8-6 8-6zm-9 0v12l-8-6 8-6z"/></svg>';
-    const ICON_NEXT = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6v12l8-6-8-6zm9 0v12l8-6-8-6z"/></svg>';
 
     function buildTransportHtml() {
       return '<div class="transport">' +
