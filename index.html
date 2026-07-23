@@ -364,10 +364,12 @@
     background: none;
     border: none;
     color: #fff;
-    font-size: 1.5rem;
     padding: 0.5rem 0.7rem;
     cursor: pointer;
     opacity: 0.9;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .transport button.nav:disabled {
@@ -607,11 +609,14 @@
         '<div class="labels"><span class="label-left"></span><span class="label-right"></span></div></div>';
     }
 
+    const ICON_PREV = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20 6v12l-8-6 8-6zm-9 0v12l-8-6 8-6z"/></svg>';
+    const ICON_NEXT = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6v12l8-6-8-6zm9 0v12l8-6-8-6z"/></svg>';
+
     function buildTransportHtml() {
       return '<div class="transport">' +
-        '<button type="button" class="nav prev">⏮</button>' +
+        '<button type="button" class="nav prev">' + ICON_PREV + '</button>' +
         '<span class="dot-indicator"></span>' +
-        '<button type="button" class="nav next">⏭</button>' +
+        '<button type="button" class="nav next">' + ICON_NEXT + '</button>' +
         '</div>';
     }
 
