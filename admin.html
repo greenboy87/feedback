@@ -228,6 +228,12 @@
     font-style: italic;
   }
 
+  .count-badge {
+    color: var(--ink-soft);
+    font-weight: 600;
+    font-size: 0.82rem;
+  }
+
   .single-answers {
     display: none;
     margin-top: 1.2rem;
@@ -454,6 +460,16 @@
       return (values.reduce(function (a, b) { return a + b; }, 0) / values.length).toFixed(1);
     }
 
+    function groupAnswers(answers) {
+      const counts = new Map();
+      answers.forEach(function (a) {
+        counts.set(a, (counts.get(a) || 0) + 1);
+      });
+      return Array.from(counts.entries()).sort(function (a, b) {
+        return b[1] - a[1];
+      });
+    }
+
     function renderKlassen(classes) {
       const list = document.getElementById("klassen-list");
       const emptyMsg = document.getElementById("empty-msg");
@@ -492,7 +508,12 @@
           if (answers.length === 0) {
             openHtml += '<p class="none">Keine Antworten</p>';
           } else {
-            openHtml += '<ul>' + answers.map(function (a) { return '<li>' + escapeHtml(a) + '</li>'; }).join("") + '</ul>';
+            const grouped = groupAnswers(answers);
+            openHtml += '<ul>' + grouped.map(function (entry) {
+              const text = escapeHtml(entry[0]);
+              const count = entry[1];
+              return '<li>' + text + (count > 1 ? ' <span class="count-badge">(' + count + 'x)</span>' : '') + '</li>';
+            }).join("") + '</ul>';
           }
         });
 
