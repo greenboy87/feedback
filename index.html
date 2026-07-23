@@ -171,6 +171,93 @@
     transform: scale(1.2);
   }
 
+  .scale-wrap {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .scale-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 250px;
+  }
+
+  .scale-labels {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 250px;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .slider-wrap {
+    width: 100%;
+    max-width: 250px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .slider-wrap input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 2px;
+    outline: none;
+  }
+
+  .slider-wrap input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #e0a850;
+    cursor: pointer;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+  }
+
+  .slider-wrap input[type="range"]::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: none;
+    background: #e0a850;
+    cursor: pointer;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+  }
+
+  .scale-row button {
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.06);
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.12s ease, background 0.12s ease, color 0.12s ease;
+  }
+
+  .scale-row button.filled {
+    background: #e0a850;
+    border-color: #e0a850;
+    color: #1c1c1e;
+  }
+
+  .scale-row button:active {
+    transform: scale(1.15);
+  }
+
   .text-answer {
     width: 100%;
   }
@@ -329,14 +416,22 @@
     const klasse = new URLSearchParams(window.location.search).get("klasse") || "";
 
     const QUESTIONS = [
-      { type: "stars", key: "verstaendlich", text: "Wie verständlich waren meine Erklärungen?" },
-      { type: "stars", key: "atmosphaere", text: "Wie war die Atmosphäre im Unterricht?" },
+      { type: "stars", key: "atmosphaere", text: "Wie fandest du die Atmosphäre im Unterricht?" },
+      { type: "stars", key: "abwechslung", text: "Wie abwechslungsreich fandest du den Unterricht?" },
+      { type: "stars", key: "hilfe", text: "Habe ich dir bei Problemen weitergeholfen?" },
+      { type: "stars", key: "verstaendlich", text: "Wie fandest du die Erklärungen?" },
       { type: "stars", key: "fairness", text: "Wie fair fandest du die Bewertungen/Noten?" },
-      { type: "stars", key: "abwechslung", text: "Wie abwechslungsreich war der Unterricht?" },
-      { type: "stars", key: "hilfe", text: "Wie gut konntest du bei Problemen Hilfe bekommen?" },
-      { type: "stars", key: "zufriedenheit", text: "Wie zufrieden warst du insgesamt mit dem Schuljahr?" },
+      { type: "stars", key: "begeisterung", text: "Konnte ich dich für das Fach begeistern?" },
+      { type: "stars", key: "pruefungsvorbereitung", text: "Hat dich der Unterricht gut auf Prüfungen vorbereitet?" },
+      { type: "stars", key: "ruhe", text: "War der Unterricht ruhig und frei von Störungen?" },
+      { type: "stars", key: "regeln", text: "War der Unterricht mit klaren Regeln strukturiert?" },
+      { type: "stars", key: "humor", text: "War ich humorvoll?" },
+      { type: "slider", key: "gelassenheit", text: "Wie wirke ich auf dich?", endLabels: ["Hektisch", "Gelassen"] },
+      { type: "scale10", key: "zufriedenheit", text: "Wie zufrieden warst du insgesamt mit dem Schuljahr?" },
       { type: "text", key: "gelernt", text: "Was hast du dieses Schuljahr gelernt?" },
       { type: "text", key: "gefallen", text: "Was hat dir am besten gefallen?" },
+      { type: "text", key: "projekt", text: "Gibt es ein Projekt, das dir besonders gefiel?" },
+      { type: "text", key: "methoden", text: "Welche Methoden haben dir gut gefallen? (z. B. Einzelarbeit, Partnerarbeit, Kurzreferate, iPad-Arbeit, kreative Aufgaben)" },
       { type: "text", key: "aendern", text: "Was hat dir weniger gefallen / was würdest du ändern?" },
       { type: "text", key: "schwierig", text: "Was war für dich am schwierigsten?" },
       { type: "emoji", key: "emojis", text: "Beschreib den Unterricht in Emojis 😄" },
@@ -407,6 +502,13 @@
         answerHtml = '<div class="stars-row" data-key="' + q.key + '"></div>';
       } else if (q.type === "emoji") {
         answerHtml = '<div class="emoji-answer"><input type="text" data-key="' + q.key + '" placeholder="🎸📚🔥"></div>';
+      } else if (q.type === "scale10") {
+        answerHtml = '<div class="scale-wrap"><div class="scale-row" data-key="' + q.key + '"></div></div>';
+      } else if (q.type === "slider") {
+        answerHtml = '<div class="slider-wrap">' +
+          '<input type="range" min="1" max="5" step="1" value="3" data-key="' + q.key + '">' +
+          '<div class="scale-labels"><span>' + escapeHtml(q.endLabels[0]) + '</span><span>' + escapeHtml(q.endLabels[1]) + '</span></div>' +
+          '</div>';
       } else {
         answerHtml = '<div class="text-answer"><textarea data-key="' + q.key + '"></textarea></div>';
       }
@@ -444,6 +546,35 @@
             });
           });
         });
+      } else if (q.type === "scale10") {
+        const row = device.querySelector(".scale-row");
+        for (let i = 1; i <= 10; i++) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.textContent = i;
+          btn.dataset.value = i;
+          row.appendChild(btn);
+        }
+        const buttons = Array.from(row.querySelectorAll("button"));
+        buttons.forEach(function (btn) {
+          btn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            const value = Number(btn.dataset.value);
+            const current = answers[q.key] || 0;
+            answers[q.key] = current === value ? 0 : value;
+            buttons.forEach(function (b) {
+              b.classList.toggle("filled", Number(b.dataset.value) === answers[q.key]);
+            });
+          });
+        });
+      } else if (q.type === "slider") {
+        const input = device.querySelector("input[type='range']");
+        answers[q.key] = Number(input.value);
+        input.addEventListener("input", function () {
+          answers[q.key] = Number(input.value);
+        });
+        input.addEventListener("pointerdown", function (e) { e.stopPropagation(); });
+        input.addEventListener("touchstart", function (e) { e.stopPropagation(); }, { passive: true });
       } else {
         const field = device.querySelector("[data-key='" + q.key + "']");
         field.addEventListener("input", function () {

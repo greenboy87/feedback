@@ -395,17 +395,25 @@
     const TEACHER_PASSWORD = "feedback2026";
 
     const RATING_FIELDS = [
-      { key: "verstaendlich", label: "Verständlich" },
-      { key: "atmosphaere", label: "Atmosphäre" },
-      { key: "fairness", label: "Fairness" },
-      { key: "abwechslung", label: "Abwechslung" },
-      { key: "hilfe", label: "Hilfe bei Problemen" },
-      { key: "zufriedenheit", label: "Zufriedenheit gesamt" }
+      { key: "atmosphaere", label: "Atmosphäre", max: 5 },
+      { key: "abwechslung", label: "Abwechslung", max: 5 },
+      { key: "hilfe", label: "Hilfe bei Problemen", max: 5 },
+      { key: "verstaendlich", label: "Erklärungen", max: 5 },
+      { key: "fairness", label: "Fairness", max: 5 },
+      { key: "begeisterung", label: "Begeisterung fürs Fach", max: 5 },
+      { key: "pruefungsvorbereitung", label: "Prüfungsvorbereitung", max: 5 },
+      { key: "ruhe", label: "Ruhe im Unterricht", max: 5 },
+      { key: "regeln", label: "Klare Regeln", max: 5 },
+      { key: "humor", label: "Humorvoll", max: 5 },
+      { key: "gelassenheit", label: "Gelassenheit (1=hektisch, 5=gelassen)", max: 5 },
+      { key: "zufriedenheit", label: "Zufriedenheit gesamt", max: 10 }
     ];
 
     const OPEN_FIELDS = [
       { key: "gelernt", label: "Was gelernt?" },
       { key: "gefallen", label: "Was gefallen?" },
+      { key: "projekt", label: "Lieblingsprojekt" },
+      { key: "methoden", label: "Beliebte Methoden" },
       { key: "aendern", label: "Was ändern?" },
       { key: "schwierig", label: "Was war schwierig?" },
       { key: "emojis", label: "Unterricht in Emojis" },
@@ -471,7 +479,8 @@
         let avgHtml = "";
         RATING_FIELDS.forEach(function (f) {
           const avg = average(responses, f.key);
-          avgHtml += '<div class="avg-row"><span>' + f.label + '</span><span class="val">' + (avg ? avg + " ★" : "–") + '</span></div>';
+          const suffix = f.max === 10 ? "/10" : " ★";
+          avgHtml += '<div class="avg-row"><span>' + f.label + '</span><span class="val">' + (avg ? avg + suffix : "–") + '</span></div>';
         });
 
         let openHtml = "";
@@ -537,9 +546,10 @@
       });
     }
 
-    function starDisplay(value) {
+    function starDisplay(value, max) {
       const v = Number(value) || 0;
-      return '★'.repeat(v) + '☆'.repeat(5 - v);
+      if (max === 10) return v + "/10";
+      return '★'.repeat(v) + '☆'.repeat((max || 5) - v);
     }
 
     function renderSingleAnswers(responses) {
@@ -555,7 +565,7 @@
         const timeLabel = r.ts ? new Date(r.ts).toLocaleString("de-DE") : "";
 
         const starsLine = RATING_FIELDS.map(function (f) {
-          return '<span>' + f.label + ': <span class="star-val">' + starDisplay(r[f.key]) + '</span></span>';
+          return '<span>' + f.label + ': <span class="star-val">' + starDisplay(r[f.key], f.max) + '</span></span>';
         }).join("");
 
         const dl = OPEN_FIELDS.map(function (f) {
