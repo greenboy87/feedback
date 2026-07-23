@@ -234,6 +234,24 @@
     font-size: 0.82rem;
   }
 
+  .overview-count {
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    margin: -0.5rem 0 1.1rem;
+  }
+
+  .copy-answers-btn {
+    display: inline-block;
+    margin: 0.4rem 0 1rem;
+    font-size: 0.78rem;
+    padding: 0.4rem 0.7rem;
+    border-radius: 7px;
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--ink);
+    cursor: pointer;
+  }
+
   .single-answers {
     display: none;
     margin-top: 1.2rem;
@@ -393,6 +411,13 @@
       <div id="klassen-list"></div>
       <p class="empty" id="empty-msg" style="display:none;">Noch keine Klasse angelegt.</p>
     </div>
+
+    <div class="card" id="overview-card" style="display:none;">
+      <h2 class="section-title">Gesamtübersicht (alle Klassen)</h2>
+      <p class="overview-count" id="overview-count"></p>
+      <div id="overview-ratings"></div>
+      <div id="overview-open" class="open-answers"></div>
+    </div>
   </div>
 
   <script src="assets/qrcode.js"></script>
@@ -416,14 +441,14 @@
     ];
 
     const OPEN_FIELDS = [
-      { key: "gelernt", label: "Was gelernt?" },
-      { key: "gefallen", label: "Was gefallen?" },
-      { key: "projekt", label: "Lieblingsprojekt" },
-      { key: "methoden", label: "Beliebte Methoden" },
-      { key: "aendern", label: "Was ändern?" },
-      { key: "schwierig", label: "Was war schwierig?" },
-      { key: "emojis", label: "Unterricht in Emojis" },
-      { key: "sonstiges", label: "Sonstiges" }
+      { key: "gelernt", label: "Was gelernt?", question: "Was hast du dieses Schuljahr gelernt?" },
+      { key: "gefallen", label: "Was gefallen?", question: "Was hat dir am besten gefallen?" },
+      { key: "projekt", label: "Lieblingsprojekt", question: "Gibt es ein Projekt, das dir besonders gefiel?" },
+      { key: "methoden", label: "Beliebte Methoden", question: "Welche Methoden haben dir gut gefallen?" },
+      { key: "aendern", label: "Was ändern?", question: "Was hat dir weniger gefallen / was würdest du ändern?" },
+      { key: "schwierig", label: "Was war schwierig?", question: "Was war für dich am schwierigsten?" },
+      { key: "emojis", label: "Unterricht in Emojis", question: "Beschreib den Unterricht in Emojis" },
+      { key: "sonstiges", label: "Sonstiges", question: "Möchtest du mir noch etwas sagen?" }
     ];
 
     function checkPassword() {
@@ -467,6 +492,82 @@
       });
       return Array.from(counts.entries()).sort(function (a, b) {
         return b[1] - a[1];
+      });
+    }
+
+    function combineAllResponses(classes) {
+      const combined = {};
+      Object.keys(classes || {}).forEach(function (klasse) {
+        const responses = (classes[klasse] || {}).responses || {};
+        Object.keys(responses).forEach(function (id) {
+          combined[klasse + "__" + id] = responses[id];
+        });
+      });
+      return combined;
+    }
+
+    function renderOverview(classes) {
+      const card = document.getElementById("overview-card");
+      const allResponses = combineAllResponses(classes);
+      const count = Object.keys(allResponses).length;
+      const klassenCount = Object.keys(classes || {}).length;
+
+      if (count === 0) {
+        card.style.display = "none";
+        return;
+      }
+      card.style.display = "block";
+
+      document.getElementById("overview-count").textContent =
+        count + " Antwort" + (count === 1 ? "" : "en") + " aus " + klassenCount + " Klasse" + (klassenCount === 1 ? "" : "n");
+
+      let ratingsHtml = "";
+      RATING_FIELDS.forEach(function (f) {
+        const avg = average(allResponses, f.key);
+        const suffix = f.max === 10 ? "/10" : " ★";
+        ratingsHtml += '<div class="avg-row"><span>' + f.label + '</span><span class="val">' + (avg ? avg + suffix : "–") + '</span></div>';
+      });
+      document.getElementById("overview-ratings").innerHTML = ratingsHtml;
+
+      let openHtml = "";
+      OPEN_FIELDS.forEach(function (f) {
+        const answers = Object.values(allResponses)
+          .map(function (r) { return (r[f.key] || "").trim(); })
+          .filter(function (v) { return v.length > 0; });
+
+        openHtml += '<h4>' + f.label + '</h4>';
+        if (answers.length === 0) {
+          openHtml += '<p class="none">Keine Antworten</p>';
+        } else {
+          const grouped = groupAnswers(answers);
+          openHtml += '<ul>' + grouped.map(function (entry) {
+            const text = escapeHtml(entry[0]);
+            const cnt = entry[1];
+            return '<li>' + text + (cnt > 1 ? ' <span class="count-badge">(' + cnt + 'x)</span>' : '') + '</li>';
+          }).join("") + '</ul>';
+          openHtml += '<button type="button" class="copy-answers-btn" data-key="' + f.key + '">📋 Für KI-Zusammenfassung kopieren</button>';
+        }
+      });
+      document.getElementById("overview-open").innerHTML = openHtml;
+
+      document.querySelectorAll(".copy-answers-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          const key = btn.dataset.key;
+          const field = OPEN_FIELDS.find(function (f) { return f.key === key; });
+          const answers = Object.values(allResponses)
+            .map(function (r) { return (r[key] || "").trim(); })
+            .filter(function (v) { return v.length > 0; });
+
+          const text = 'Frage an Schüler:innen: "' + field.question + '"\n\n' +
+            'Fasse zusammen, was die Mehrheit geantwortet hat, welche Tendenzen erkennbar sind, und erwähne auffällige Einzelmeinungen.\n\n' +
+            'Antworten (' + answers.length + '):\n' +
+            answers.map(function (a) { return '- ' + a; }).join('\n');
+
+          navigator.clipboard.writeText(text);
+          const old = btn.textContent;
+          btn.textContent = "Kopiert! Jetzt in Claude/ChatGPT einfügen";
+          setTimeout(function () { btn.textContent = old; }, 2000);
+        });
       });
     }
 
@@ -624,7 +725,9 @@
 
     whenFirebaseReady(function () {
       window.fbOnValue(window.fbRef(window.fbDb, "classes"), function (snapshot) {
-        renderKlassen(snapshot.val() || {});
+        const classes = snapshot.val() || {};
+        renderKlassen(classes);
+        renderOverview(classes);
       });
     });
 
